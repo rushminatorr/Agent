@@ -1,4 +1,6 @@
 .idea
 target
 iofog.iml
+.gradle
+/build/
 

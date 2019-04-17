@@ -1,0 +1,6 @@
+dependencies {
+    compile 'org.glassfish:javax.json:1.0.4'
+    testCompile 'junit:junit:3.8.1'
+}
+
+description = 'iofog_version_controller'
