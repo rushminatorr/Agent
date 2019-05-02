@@ -3,7 +3,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.1'
+        classpath 'com.github.jengelman.gradle.plugins:shadow:4.0.3'
     }
 }
 
@@ -13,16 +13,21 @@ allprojects {
 }
 
 subprojects {
+
     apply plugin: 'java'
     apply plugin: 'maven-publish'
+    apply plugin: 'signing'
     apply plugin: 'com.github.johnrengelman.shadow'
 
     repositories {
         mavenCentral()
+        mavenLocal()
     }
 
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
+
+    build.dependsOn(shadowJar);
 
     task sourcesJar(type: Jar) {
         from sourceSets.main.allJava
@@ -34,11 +39,21 @@ subprojects {
         archiveClassifier = 'javadoc'
     }
 
+//    if (taskGraph.hasTask(":release")) {
+//        version = '1.0'
+//    } else {
+//        version = '1.0-SNAPSHOT'
+//    }
+
     javadoc {
         if(JavaVersion.current().isJava9Compatible()) {
             options.addBooleanOption('html5', true)
         }
     }
+
+//    signing {
+//        sign publishing.publications.mavenJava
+//    }
 
     publishing {
 
@@ -46,11 +61,10 @@ subprojects {
 
             mavenJava(MavenPublication) {
 
-                publication -> project.shadow.component(publication)
-
                 from components.java
                 artifact sourcesJar
 //                artifact javadocJar
+                artifact shadowJar
 
                 pom {
                     name = "${project.name}"
@@ -79,6 +93,7 @@ subprojects {
         }
 
         repositories {
+            mavenLocal()
 
 //            maven {
 //                url "https://.../"

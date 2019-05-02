@@ -1,0 +1,68 @@
+trigger:
+  tags:
+    include:
+      - v.*
+  branches:
+    include:
+      - develop
+      - master
+  paths:
+    exclude:
+      - README.md
+
+pr:
+  - master
+
+pool:
+  vmImage: 'Ubuntu-16.04'
+
+variables:
+  repository: 'focal-freedom-236620/agent'
+  type: $(Build.SourceBranchName)
+  commit: $(Build.SourceVersion)
+
+steps:
+  - task: Gradle@2
+    inputs:
+      workingDirectory: ''
+      gradleWrapperFile: 'gradlew'
+      gradleOptions: '-Xmx3072m'
+      javaHomeOption: 'JDKVersion'
+      jdkVersionOption: '1.8'
+      jdkArchitectureOption: 'x64'
+      publishJUnitResults: true
+      testResultsFiles: '**/TEST-*.xml'
+      tasks: 'build'
+
+  - script: |
+      echo " test"
+    displayName: 'tests'
+
+  - task: Docker@2
+    displayName: 'build and push docker image'
+    inputs:
+      containerRegistry: 'Edgeworx GCP'
+      repository: $(repository)
+      command: 'buildAndPush'
+      Dockerfile: 'Dockerfile'
+      tags: |
+        $(commit)
+        $(type)
+        latest
+
+  - script: |
+      echo "api test"
+    displayName: 'api tests'
+
+  - task: CopyFiles@2
+    inputs:
+      SourceFolder: $(System.DefaultWorkingDirectory)
+      TargetFolder: $(Build.ArtifactStagingDirectory)
+      Contents: |
+        **/*.jar
+      OverWrite: true
+
+  - task: PublishBuildArtifacts@1
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      ArtifactName: 'agent'

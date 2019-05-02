@@ -1,4 +1,4 @@
-description = 'iofog_agent_daemon'
+description = 'iofog-agent-daemon'
 
 dependencies {
     compile 'com.github.docker-java:docker-java:3.0.7'
