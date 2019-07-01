@@ -12,7 +12,7 @@ trigger:
       - README.md
 
 variables:
-  repository: 'focal-freedom-236620/agent'
+  repository: 'focal-freedom-236620/agentrush'
   primaryTag: $(Build.SourceBranchName)
   releaseCandidate: 'rc1'
 
@@ -44,12 +44,12 @@ jobs:
           ./gradlew copyJar
         displayName: 'copy jars'
 
-      - script: |
-          npm i -g snyk
-          snyk monitor --project-name=AgentCI
-        env:
-          SNYK_TOKEN: $(snykToken)
-        displayName: 'Snyk monitor'
+      # - script: |
+      #     npm i -g snyk
+      #     snyk monitor --project-name=AgentCI
+      #   env:
+      #     SNYK_TOKEN: $(snykToken)
+      #   displayName: 'Snyk monitor'
 
       - script: |
           echo 'setting secondary tag'
